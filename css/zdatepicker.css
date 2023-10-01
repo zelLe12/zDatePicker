@@ -462,7 +462,8 @@ body {
 .calendarmain div.currentDay {
     color: #db3d44;
 }
-.calendarmain div.month {
+.calendarmain div.month,
+.calendarmain div.year {
     width: 25%;
     float: left;
     padding: 20px 10px;
@@ -474,4 +475,8 @@ body {
     color: #fff;
     background: #db3d44;
     border-radius: 50%;
+}
+.calendarmain div.year.prevset,
+.calendarmain div.year.nextset {
+    color: #eee;
 }
