@@ -101,7 +101,7 @@ const getNumberOfDays = (year, month) => {
 
 //get day details
 const getDayDetails = (args) => {
-    let date = args.index - args.startFirstDay)
+    let date = args.index - args.startFirstDay
 
     //get prevMonth day details
     let prevMonth = parseInt(args.month) - 1
