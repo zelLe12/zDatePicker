@@ -91,6 +91,7 @@ createCalendar()
 const calendarWrap = document.querySelector(".calendarwrap")
 const calendarBody = document.querySelector(".calendarmain")
 const calendarHeader = document.querySelector(".calendarheader")
+const calendarTitleDiv = document.querySelector(".calendartitle")
 const calendarTitleSpan = document.querySelector(".calendartitle span")
 const calendarDays = document.querySelector(".calendardays")
 
@@ -285,12 +286,23 @@ setMonthDetails(monthDetails)
 
 
 const calendarTitle = (year, month, s) => {
-    calendarTitleSpan.innerHTML = calMonths[month] + " " + year
+    //calendarTitleSpan.innerHTML = calMonths[month] + " " + year
 
     if(s === "y") {
         calendarTitleSpan.innerHTML =  year
+        calendarTitleDiv.setAttribute("data-set", "year")
+    } else if( s === "yr") {
+        let yr = getYearRange(year)
+        yr.shift()
+        yr.pop()
+        let firstYear = yr[0]
+        let lastYear = yr[9]
+
+        calendarTitleSpan.innerHTML =firstYear + "-" + lastYear
+        calendarTitleDiv.setAttribute("data-set", "year-range")
     } else {
         calendarTitleSpan.innerHTML = calMonths[month] + " " + year
+        calendarTitleDiv.setAttribute("data-set", "month-year")
     }
 }
 calendarTitle(year, month)
@@ -383,6 +395,69 @@ const updateMonth = (y, m) => {
     updateInput()
 }
 
+const getYearRange = (year) => {
+    //set 10 years per range but show 12
+    let startYear = year
+    let firstThree = startYear.toString().substring(0,3)
+
+    let yearRange = []
+
+    for( let i = 0; i < 10; i++) {
+        yearRange.push(firstThree+i)
+    }
+
+    let previousSetLast = parseInt(yearRange[0]) - 1
+    yearRange.unshift(previousSetLast)
+
+    let nextSetFirst = parseInt(yearRange[10]) + 1
+
+    yearRange.push(nextSetFirst)
+    
+    return yearRange
+}
+const setYearRange = (year) => {
+    let newYearRange = getYearRange(year)
+    
+    for(let i = 0; i < newYearRange.length; i++) {
+        let div = document.createElement("div")
+        let span = document.createElement("span")
+
+        div.setAttribute("class","year")
+
+        if(i === 0) {
+            div.classList.add("prevset")
+        } else if( i === 11) {
+            div.classList.add("nextset")
+        }
+
+        span.innerHTML = newYearRange[i]
+
+        if(newYearRange[i] == year) {
+            div.classList.add("active", "selected")
+        }
+        
+        div.appendChild(span)
+        
+        calendarBody.appendChild(div)
+    }
+
+    document.querySelectorAll(".year").forEach((m) => {
+        m.addEventListener("click", () => {
+            //change to month
+            let yrYear = m.innerText
+
+            calendarTitle(yrYear, 0, "y")
+
+            calendarBody.innerHTML = ""
+            showMonths(yrYear, 0)
+
+            document.querySelectorAll(".cal-nav").forEach((a) => {
+                a.setAttribute("data-set","year")
+            })
+        })
+    })
+}
+
 const updateCalendar = (btn, set) => {
     let newCalendar, offset
     
@@ -394,18 +469,20 @@ const updateCalendar = (btn, set) => {
         offset = 0
     }
 
-    if( set === "month") {
+    if( set === "year") {
        newCalendar = calNav(offset, set)
        calendarTitle(newCalendar, month, "y")
        calendarBody.innerHTML = ""
        showMonths(year, month)
+    } else if( set === "year-range") {
+        newCalendar = calNav(offset, set)
+        calendarTitle(newCalendar, month, "yr")
+        calendarBody.innerHTML = ""
+        setYearRange(year)
     } else { 
-
         newCalendar = calNav(offset, set)
         newMonthDetails = getMonthDetails(newCalendar.year, newCalendar.month)
-
         calendarTitle(newCalendar.year, newCalendar.month)
-
         calendarBody.innerHTML = ""
         setMonthDetails(newCalendar.MonthDetails)
     }
@@ -414,8 +491,18 @@ const updateCalendar = (btn, set) => {
 
 const calNav = (offset, set) => {
     
-    if(set == "month") {
+    if(set == "year") {
         year = parseInt(year) + offset
+        return year
+    } if(set == "year-range") {
+        let startYear
+
+        if(offset === -1) {
+            year = parseInt(year) - 10
+        } else if(offset === 1) {
+            year = parseInt(year) + 10
+        }
+
         return year
     } else {
         if(offset != 0) {
@@ -446,14 +533,31 @@ document.querySelector(".zdatepicker").addEventListener("click", (i) => {
 })
 
 document.querySelector(".calendartitle").addEventListener("click", (t) => {
-    calendarTitle(year, month, "y")
 
-    document.querySelectorAll(".cal-nav").forEach((a) => {
-        a.setAttribute("data-set","month")
-    })
+    let set = document.querySelector(".calendartitle").getAttribute("data-set")
+
+    let navset
+    if(set == "month-year") {
+        calendarTitle(year, month, "y")
+        navset = "year"
     
-    calendarBody.innerHTML = ""
-    showMonths(year, month)
+        calendarBody.innerHTML = ""
+        showMonths(year, month)
+
+        document.querySelectorAll(".cal-nav").forEach((a) => {
+            a.setAttribute("data-set", navset)
+        })
+    } else if(set == "year") {
+        calendarTitle(year, month, "yr")
+        navset = "year-range"
+    
+        calendarBody.innerHTML = ""
+        setYearRange(year, month)
+
+        document.querySelectorAll(".cal-nav").forEach((a) => {
+            a.setAttribute("data-set", navset)
+        })
+    }
 })
 
 document.querySelectorAll(".cal-nav").forEach((btn) => {
