@@ -95,6 +95,20 @@ const calendarTitleDiv = document.querySelector(".calendartitle")
 const calendarTitleSpan = document.querySelector(".calendartitle span")
 const calendarDays = document.querySelector(".calendardays")
 
+const createDaysOfWeek = () => {
+    for(let i = 0; i < calDays.length; i++) {
+        let div = document.createElement("div")
+        let span = document.createElement("span")
+    
+        div.setAttribute("class", "dayofweek")
+        span.innerHTML = calDays[i]
+    
+        div.appendChild(span)
+        calendarDays.appendChild(div)
+    }
+}
+createDaysOfWeek()
+
 //get number of days in a month
 const getNumberOfDays = (year, month) => {
     return 42 - new Date(year, month, 42).getDate()
@@ -375,6 +389,8 @@ const showMonths = (year, month) => {
 
             document.querySelectorAll(".cal-nav").forEach((a) => {
                 a.setAttribute("data-set","month-year")
+                calendarDays.classList.remove("hide")
+                calendarDays.classList.add("show")
             })
         })
     })
@@ -488,6 +504,7 @@ const updateCalendar = (btn, set) => {
         newCalendar = calNav(offset, set)
         newMonthDetails = getMonthDetails(newCalendar.year, newCalendar.month)
         calendarTitle(newCalendar.year, newCalendar.month)
+
         calendarBody.innerHTML = ""
         setMonthDetails(newCalendar.MonthDetails)
     }
@@ -543,7 +560,8 @@ document.querySelector(".calendartitle").addEventListener("click", (t) => {
     if(set == "month-year") {
         calendarTitle(year, month, "y")
         navset = "year"
-    
+        
+        calendarDays.classList.add("hide")
         calendarBody.innerHTML = ""
         showMonths(year, month)
 
