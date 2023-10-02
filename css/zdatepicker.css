@@ -434,9 +434,16 @@ body {
 .calendarheader .calendartitle {
     font-weight: 600;
 }
-.calendarDays {
+.calendardays {
     width: 100%;
     overflow: hidden;
+}
+.calendardays.hide {
+    display: none;
+}
+}
+.calendardays.show {
+    display: block;
 }
 .dayofweek {
     float: left;
