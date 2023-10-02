@@ -348,7 +348,6 @@ const updateInput = () => {
 };
 updateInput();
 
-
 const showMonths = (year, month) => {
     for(let i = 0; i < calMonths.length; i++) {
         let div = document.createElement("div")
@@ -395,9 +394,9 @@ const updateMonth = (y, m) => {
     updateInput()
 }
 
-const getYearRange = (year) => {
+
+const getYearRange = (startYear) => {
     //set 10 years per range but show 12
-    let startYear = year
     let firstThree = startYear.toString().substring(0,3)
 
     let yearRange = []
@@ -415,9 +414,10 @@ const getYearRange = (year) => {
     
     return yearRange
 }
-const setYearRange = (year) => {
-    let newYearRange = getYearRange(year)
-    
+
+const setYearRange = (sYear) => {
+    let newYearRange = getYearRange(sYear)
+
     for(let i = 0; i < newYearRange.length; i++) {
         let div = document.createElement("div")
         let span = document.createElement("span")
@@ -432,27 +432,32 @@ const setYearRange = (year) => {
 
         span.innerHTML = newYearRange[i]
 
-        if(newYearRange[i] == year) {
+        if(newYearRange[i] == sYear) {
             div.classList.add("active", "selected")
         }
         
         div.appendChild(span)
-        
         calendarBody.appendChild(div)
     }
 
     document.querySelectorAll(".year").forEach((m) => {
         m.addEventListener("click", () => {
             //change to month
-            let yrYear = m.innerText
+            year = parseInt(m.innerText)
 
-            calendarTitle(yrYear, 0, "y")
+            let navset = "year"
+            
+            calendarTitle(sYear, 0, "y")
+
+            let nYearTimeStamp = new Date(sYear, month, selectedDay).getTime()
+            setDateToInput(nYearTimeStamp)
 
             calendarBody.innerHTML = ""
-            showMonths(yrYear, 0)
+            //showMonths(year, 0)
+            updateCalendar(0, navset)
 
             document.querySelectorAll(".cal-nav").forEach((a) => {
-                a.setAttribute("data-set","year")
+                a.setAttribute("data-set", navset)
             })
         })
     })
@@ -473,12 +478,12 @@ const updateCalendar = (btn, set) => {
        newCalendar = calNav(offset, set)
        calendarTitle(newCalendar, month, "y")
        calendarBody.innerHTML = ""
-       showMonths(year, month)
+       showMonths(newCalendar, month)
     } else if( set === "year-range") {
         newCalendar = calNav(offset, set)
         calendarTitle(newCalendar, month, "yr")
         calendarBody.innerHTML = ""
-        setYearRange(year)
+        setYearRange(newCalendar)
     } else { 
         newCalendar = calNav(offset, set)
         newMonthDetails = getMonthDetails(newCalendar.year, newCalendar.month)
@@ -495,8 +500,6 @@ const calNav = (offset, set) => {
         year = parseInt(year) + offset
         return year
     } if(set == "year-range") {
-        let startYear
-
         if(offset === -1) {
             year = parseInt(year) - 10
         } else if(offset === 1) {
